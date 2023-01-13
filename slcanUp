@@ -38,4 +38,4 @@ echo sudo ifconfig slcan0 up
 sudo ifconfig slcan0 up
 
 echo
-ifconfig -v | grep -A 5 slcan0
+ifconfig -v | grep -A 5 can0
