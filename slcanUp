@@ -1,0 +1,41 @@
+# !/bin/zsh
+sudo modprobe can
+sudo modprobe can-raw
+sudo modprobe slcan
+
+DEVICE=$(find /dev/serial/by-id/ -name *USBtin*)
+echo "Binding can port on device ${DEVICE}"
+
+if [$1 == ""]
+then
+	BAUD=5
+	echo "No input provided> using standard baud rate"
+else
+	BAUD=$1
+	echo "Baud rate selected: $BAUD"
+fi
+
+echo
+echo sudo slcan_attach -f -s ${BAUD} -o ${DEVICE}
+sudo slcan_attach -f -s ${BAUD} -o ${DEVICE}
+# -s stand for speed:
+# 0 - 10 Kbps
+# 1 - 20 Kbps
+# 2 - 50 Kbps
+# 3 - 100 Kbps
+# 4 - 125 Kbps
+# 5 - 250 Kbps
+# 6 - 500 Kbps
+# 7 - 800 Kbps
+# 8 - 1 Mbps
+
+echo
+echo sudo slcand ${DEVICE} slcan0
+sudo slcand ${DEVICE} slcan0
+
+echo
+echo sudo ifconfig slcan0 up
+sudo ifconfig slcan0 up
+
+echo
+ifconfig -v | grep -A 5 slcan0
