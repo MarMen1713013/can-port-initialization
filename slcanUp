@@ -1,41 +1,62 @@
-# !/bin/zsh
+#!/bin/zsh
+
+HELP_MSG="\nScript usage:\tslcanUp [VALUE]\n
+Where [VALUE] has possible options
+\t0 - 10 Kbps
+\t1 - 20 Kbps
+\t2 - 50 Kbps
+\t3 - 100 Kbps
+\t4 - 125 Kbps
+\t5 - 250 Kbps
+\t6 - 500 Kbps
+\t7 - 800 Kbps
+\t8 - 1 Mbps"
+
+for arg in "$@"
+do
+    case $arg in
+        -h|--help)
+            echo "$HELP_MSG"
+            exit 0
+            ;;
+        -*)
+            echo "WRONG OPTION: try ./test [-h|--help]"
+            shift
+            ;;
+        *)
+            OTHER_ARGUMENTS+=("$1")
+            shift
+            ;;
+    esac
+done
+
+ARG_NUM=${#OTHER_ARGUMENTS[@]}
+if [ $ARG_NUM -gt "1" ]
+then
+    echo "Too many arguments\ntry slcanUp [-h|--help]"
+    return 1
+fi
+
 sudo modprobe can
 sudo modprobe can-raw
 sudo modprobe slcan
 
-DEVICE=$(find /dev/serial/by-id/ -name *USBtin*)
+
+DEVICE=$(find /dev/serial/by-id/ -name '*USBtin*')
+#DEVICE=${$(find /dev/serial/by-id/ -name '*USBtin*')##*/}
 echo "Binding can port on device ${DEVICE}"
 
-if [$1 == ""]
+if [ -z $OTHER_ARGUMENTS ]
 then
 	BAUD=5
-	echo "No input provided> using standard baud rate"
+	echo "No input provided using standard baud rate BAUD=5"
 else
-	BAUD=$1
+	BAUD=$OTHER_ARGUMENTS
 	echo "Baud rate selected: $BAUD"
 fi
 
-echo
-echo sudo slcan_attach -f -s ${BAUD} -o ${DEVICE}
 sudo slcan_attach -f -s ${BAUD} -o ${DEVICE}
-# -s stand for speed:
-# 0 - 10 Kbps
-# 1 - 20 Kbps
-# 2 - 50 Kbps
-# 3 - 100 Kbps
-# 4 - 125 Kbps
-# 5 - 250 Kbps
-# 6 - 500 Kbps
-# 7 - 800 Kbps
-# 8 - 1 Mbps
-
-echo
-echo sudo slcand ${DEVICE} slcan0
 sudo slcand ${DEVICE} slcan0
-
-echo
-echo sudo ifconfig slcan0 up
 sudo ifconfig slcan0 up
-
 echo
 ifconfig -v | grep -A 5 can0
