@@ -22,6 +22,7 @@ do
         -*)
             echo "WRONG OPTION: try ./test [-h|--help]"
             shift
+            exit 1
             ;;
         *)
             OTHER_ARGUMENTS+=("$1")
