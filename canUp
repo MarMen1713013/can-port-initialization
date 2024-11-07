@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 HELP_MSG="\nScript usage:\tcanUp [VALUE]\n
 Where [VALUE] has possible options
@@ -16,7 +16,7 @@ for arg in "$@"
 do
     case $arg in
         -h|--help)
-            echo "$HELP_MSG"
+            echo -e "$HELP_MSG"
             exit 0
             ;;
         -*)
